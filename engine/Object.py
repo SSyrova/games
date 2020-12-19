@@ -27,6 +27,9 @@ class Player(Object):
         self.speedx = 0
         self.speedy = 0
         self.init_animation()
+        self.speed = 3
+        self.isBoost = False
+        self.timer = 0
 
     def init_animation(self):
         self.idle_animation = [pygame.transform.scale(pygame.image.load('img/player/1.png'), (40, 40))]
@@ -63,17 +66,36 @@ class Player(Object):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.speedx = - 3
+                    self.speedx = - self.speed
                 elif event.key == pygame.K_RIGHT:
-                    self.speedx = 3
+                    self.speedx = self.speed
                 elif event.key == pygame.K_SPACE:
                     self.speedy = -15
             elif event.type == pygame.KEYUP:
-                if (event.key == pygame.K_LEFT and self.speedx == -3) or (event.key == pygame.K_RIGHT and self.speedx == 3):
+                if (event.key == pygame.K_LEFT and self.speedx == -self.speed) or (event.key == pygame.K_RIGHT and self.speedx == self.speed):
                     self.speedx = 0
 
     def update(self, *args):
         self.calc_gravity()
+
+        boosters = pygame.sprite.spritecollide(self, args[1], False)
+        if boosters:
+            self.speed = 15
+            if self.speedx >= 0:
+                self.speedx = self.speed
+            elif self.speedx <= 0:
+                self.speedx = - self.speed
+            self.isBoost = True
+            self.timer = 20
+            for booster in boosters:
+                booster.kill()
+
+        if self.isBoost and self.timer > 0:
+            self.timer -= 1
+
+        if self.isBoost and self.timer == 0:
+            self.isBoost = False
+            self.speed = 3
 
         h = pygame.display.get_surface().get_height()
         if self.rect.bottom > h and self.speedy > 0:
@@ -170,6 +192,15 @@ class Enemy(Object):
     def __init__(self, position,  * groups):
         super().__init__(*groups)
         self.image = pygame.transform.scale(pygame.image.load('img/enemy/rick.png'), (40, 40))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = position[0]
+        self.rect.centery = position[1]
+
+
+class Booster(Object):
+    def __init__(self, position, *groups):
+        super().__init__(*groups)
+        self.image = pygame.transform.scale(pygame.image.load('img/booster/booster.png'), (40, 40))
         self.rect = self.image.get_rect()
         self.rect.centerx = position[0]
         self.rect.centery = position[1]

@@ -44,7 +44,7 @@ class GameLogic(Logic):
             self.level.shiftLevel(diff, 0)
 
     def update(self):
-        self.player.update(self.level.blocks)
+        self.player.update(self.level.blocks, self.level.boosters)
         self.level.update(self.player.rect)
         self.update_camera()
 

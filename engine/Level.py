@@ -15,6 +15,7 @@ class Level():
         self.enemies = pygame.sprite.Group()
         Level.score = 0
         self.font = pygame.font.SysFont('Comic Sans MS', 15)
+        self.boosters = pygame.sprite.Group()
 
         W_W, W_H = pygame.display.get_surface().get_size()
         offsetY = W_H - self.size[1] * 20
@@ -37,6 +38,10 @@ class Level():
                     from engine.Object import Enemy
                     enemy = Enemy((w * 20 + 10, h * 20 + 10 + offsetY))
                     self.enemies.add(enemy)
+                if c == 'B':
+                    from engine.Object import Booster
+                    booster = Booster((w * 20, h * 20 + offsetY))
+                    self.boosters.add(booster)
 
         self.level_offsetX = 0
         self.level_offsetY = 0
@@ -66,6 +71,9 @@ class Level():
         for coin in self.coins:
             coin.rect.x += offsetX
             coin.rect.y += offsetY
+        for booster in self.boosters:
+            booster.rect.x += offsetX
+            booster.rect.y += offsetY
 
     def update(self, player_rect):
         for coin in self.coins:
@@ -75,5 +83,6 @@ class Level():
         self.block_group.draw(window)
         self.coins.draw(window)
         self.enemies.draw(window)
+        self.boosters.draw(window)
         score_text = self.font.render("Score: " + str(Level.score), 1, (0, 0, 0))
         window.blit(score_text, (5, 10))
